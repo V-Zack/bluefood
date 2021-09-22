@@ -1,6 +1,7 @@
 package br.com.softblue.bluefood.infrastructure.web.controller;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import javax.validation.Valid;
 
@@ -20,6 +21,8 @@ import br.com.softblue.bluefood.application.service.RestauranteService;
 import br.com.softblue.bluefood.application.service.ValidationException;
 import br.com.softblue.bluefood.domain.cliente.Cliente;
 import br.com.softblue.bluefood.domain.cliente.ClienteRepository;
+import br.com.softblue.bluefood.domain.pedido.Pedido;
+import br.com.softblue.bluefood.domain.pedido.PedidoRepository;
 import br.com.softblue.bluefood.domain.restaurante.CategoriaRestaurante;
 import br.com.softblue.bluefood.domain.restaurante.CategoriaRestauranteRepository;
 import br.com.softblue.bluefood.domain.restaurante.ItemCardapio;
@@ -46,6 +49,9 @@ public class ClienteController {
 	private RestauranteRepository restauranteRepository;
 	
 	@Autowired
+	private PedidoRepository pedidoRepository;
+	
+	@Autowired
 	private ClienteService clienteService;
 	
 	@Autowired
@@ -57,12 +63,16 @@ public class ClienteController {
 		List<CategoriaRestaurante> categorias = categoriaRestauranteRepository.findAll(Sort.by("nome"));
 		model.addAttribute("categorias", categorias);
 		model.addAttribute("searchFilter", new SearchFilter());
+		
+		List<Pedido> pedidos = pedidoRepository.listPedidosByCliente(SecurityUtils.loggedCliente().getId());
+		model.addAttribute("pedidos",pedidos);
+		
 		return "cliente-home";
 	}
 	@GetMapping("/edit")
 	public String edit(Model model) {
 		Integer clienteId = SecurityUtils.loggedCliente().getId();
-		Cliente cliente = clienteRepository.findById(clienteId).orElseThrow();
+		Cliente cliente = clienteRepository.findById(clienteId).orElseThrow(NoSuchElementException::new);
 		model.addAttribute("cliente", cliente);
 		ControllerHelper.setEditMode(model, true);
 		
@@ -110,7 +120,7 @@ public class ClienteController {
 			@RequestParam(value = "categoria", required = false) String categoria,
 	        Model model) {
 		
-		Restaurante restaurante = restauranteRepository.findById(restauranteId).orElseThrow();
+		Restaurante restaurante = restauranteRepository.findById(restauranteId).orElseThrow(NoSuchElementException::new);
 		model.addAttribute("restaurante", restaurante);
 		model.addAttribute("cep", SecurityUtils.loggedCliente().getCep());
 		

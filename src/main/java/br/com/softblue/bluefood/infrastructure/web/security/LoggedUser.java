@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import br.com.softblue.bluefood.domain.cliente.Cliente;
 import br.com.softblue.bluefood.domain.restaurante.Restaurante;
 import br.com.softblue.bluefood.domain.usuario.Usuario;
+import br.com.softblue.bluefood.util.CollectionUtils;
 
 @SuppressWarnings("serial")
 public class LoggedUser implements UserDetails {
@@ -28,10 +29,10 @@ public class LoggedUser implements UserDetails {
 		}else if(usuario instanceof Restaurante) {
 			role = Role.RESTAURANTE;
 		}else {
-			throw new IllegalStateException("O tipo de usu·rio n„o È v·lido");
+			throw new IllegalStateException("O tipo de usu√°rio n√£o √© v√°lido");
 		}
 		this.role = role;
-		this.roles = List.of(new SimpleGrantedAuthority("ROLE_" + role));
+		this.roles = CollectionUtils.listOf(new SimpleGrantedAuthority("ROLE_" + role));
 		
 	}
 

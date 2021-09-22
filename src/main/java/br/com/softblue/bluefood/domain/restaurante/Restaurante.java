@@ -41,23 +41,23 @@ import lombok.ToString;
 
 public class Restaurante extends Usuario {
 	
-	@NotBlank(message = "O CNPJ n„o pode ser vazio")
-	@Pattern(regexp ="[0-9]{14}", message ="O CNPJ possui formato inv·lido")
+	@NotBlank(message = "O CNPJ n√£o pode ser vazio")
+	@Pattern(regexp ="[0-9]{14}", message ="O CNPJ possui formato inv√°lido")
 	@Column(length = 14, nullable = false)
 	private String cnpj;
 	
 	@Size(max = 80)
 	private String logotipo;
 	
-	@UploadConstraint(acceptedTypes = FileType.PNG, message = "O arquivo n„o È um arquivo de imagem v·lido.")
+	@UploadConstraint(acceptedTypes = FileType.PNG, message = "O arquivo n√£o √© um arquivo de imagem v√°lido.")
 	private transient MultipartFile logotipoFile;
 	
-	@NotNull(message = "A taxa de entrega n„o pode ser vazia")
+	@NotNull(message = "A taxa de entrega n√£o pode ser vazia")
 	@Min(0)
 	@Max(99)
 	private BigDecimal taxaEntrega;
 	
-	@NotNull(message = "O tempo de entrega n„o pode ser vazio")
+	@NotNull(message = "O tempo de entrega n√£o pode ser vazio")
 	@Min(0)
 	@Max(120)
 	private Integer tempoEntregaBase;
@@ -78,7 +78,7 @@ public class Restaurante extends Usuario {
 
 	public void setLogotipoFileName() {
 		if(getId() == null) {
-			throw new IllegalComponentStateException("… preciso primeiro gravar o registro");
+			throw new IllegalComponentStateException("√© preciso primeiro gravar o registro");
 		}
 	
 		this.logotipo = String.format("%04d-logo.%s", getId(), FileType.of(logotipoFile.getContentType()).getExtension());

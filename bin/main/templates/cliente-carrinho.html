@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html 
       xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:th="http://www.thymeleaf.org" layout:decorate="~{Layout}" th:with="link=@{/cliente/home}">
+      xmlns:th="http://www.thymeleaf.org" layout:decorate="~{layout}" th:with="link=@{/cliente/home}">
 	
 	<body>
 	<div layout:fragment="content">
@@ -22,6 +22,7 @@
 			<span id="restauranteOpcaoTaxa" th:text="${item.observacoes}"></span><br/>
 			<span id="restauranteOpcaoTaxa" th:text="${#numbers.formatCurrency(item.preco)}"></span><br/><br/>
 			<input type="button" value="Remover" th:onclick="'location.href=\''+ @{/cliente/carrinho/remover} + '?itemId=' + ${item.itemCardapio.id} + '\';'" />
+	        <br/><br/>	
 		</div>
 		<br/><br/>
 		
@@ -45,18 +46,18 @@
 		
 		<br/><br/>
 		
-		<br/><br/>
-		
+		<form method="post" th:action="@{/cliente/pagamento/pagar}">
 		<div>
 			<span id="restauranteOpcaoTitulo">Cartão de Crédito</span><br>
-			<input type="text" id="inputLargo" onkeypress="return isNumberKey(event)" />
+			<input name="numCartao" type="text" id="inputLargo" onkeypress="return isNumberKey(event)" />
 		</div>
 		<br/>
 		
-		
 		<div>
-			<input type="button" value="Enviar pedido" onClick="location.href='clientePedido.html';" />
-		   </div>
+			<input type="submit" value="Enviar pedido" />
+		</div>
+		   </form>
+		   
          </div>
        </div>
 

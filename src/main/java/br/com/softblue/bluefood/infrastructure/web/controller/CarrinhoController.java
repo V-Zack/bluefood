@@ -1,5 +1,7 @@
 package br.com.softblue.bluefood.infrastructure.web.controller;
 
+import java.util.NoSuchElementException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -11,6 +13,9 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 
 import br.com.softblue.bluefood.domain.pedido.Carrinho;
+import br.com.softblue.bluefood.domain.pedido.ItemPedido;
+import br.com.softblue.bluefood.domain.pedido.Pedido;
+import br.com.softblue.bluefood.domain.pedido.PedidoRepository;
 import br.com.softblue.bluefood.domain.pedido.RestauranteDiferenteException;
 import br.com.softblue.bluefood.domain.restaurante.ItemCardapio;
 import br.com.softblue.bluefood.domain.restaurante.ItemCardapioRepository;
@@ -22,6 +27,9 @@ public class CarrinhoController {
 	
 	@Autowired
 	private ItemCardapioRepository itemCardapioRepository;
+	
+	@Autowired
+	private PedidoRepository pedidoRepository;
 	
 	@ModelAttribute("carrinho")
 	public Carrinho carrinho() {
@@ -41,12 +49,12 @@ public class CarrinhoController {
 			@ModelAttribute("carrinho") Carrinho carrinho,
 			Model model) {
 		
-		ItemCardapio itemCardapio = itemCardapioRepository.findById(itemId).orElseThrow();
+		ItemCardapio itemCardapio = itemCardapioRepository.findById(itemId).orElseThrow(NoSuchElementException::new);
 		
 		try {
 			carrinho.adicionarItem(itemCardapio,quantidade, observacoes);
 		} catch (RestauranteDiferenteException e) {
-			model.addAttribute("msg", "Não é possivel misturar comidas de restaurantes diferentes");
+			model.addAttribute("msg", "NÃ£o Ã© possivel misturar comidas de restaurantes diferentes");
 		}
 		
 		return "cliente-carrinho";
@@ -58,7 +66,7 @@ public class CarrinhoController {
 			SessionStatus sessionStatus,
 			Model model) {
 		
-		ItemCardapio itemCardapio = itemCardapioRepository.findById(itemId).orElseThrow();
+		ItemCardapio itemCardapio = itemCardapioRepository.findById(itemId).orElseThrow(NoSuchElementException::new);
 		
 		carrinho.removerItem(itemCardapio);
 		
@@ -67,4 +75,20 @@ public class CarrinhoController {
 		}
 		return "cliente-carrinho";
 	}
+	@GetMapping(path ="/refazerCarrinho")
+	public String refazerCarrinho(
+			@RequestParam("pedidoId") Integer pedidoId,
+		    @ModelAttribute("carrinho") Carrinho carrinho,
+		    Model model) {
+		Pedido pedido = pedidoRepository.findById(pedidoId).orElseThrow(NoSuchElementException::new);
+		
+		carrinho.limpar();
+		
+		for (ItemPedido itemPedido : pedido.getItens()) {
+			carrinho.adicionarItem(itemPedido);
+		}
+		return "cliente-carrinho";
+		
+	}
+	
 }

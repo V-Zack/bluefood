@@ -1,8 +1,10 @@
 package br.com.softblue.bluefood.application.test;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -11,6 +13,9 @@ import org.springframework.stereotype.Component;
 
 import br.com.softblue.bluefood.domain.cliente.Cliente;
 import br.com.softblue.bluefood.domain.cliente.ClienteRepository;
+import br.com.softblue.bluefood.domain.pedido.Pedido;
+import br.com.softblue.bluefood.domain.pedido.Pedido.Status;
+import br.com.softblue.bluefood.domain.pedido.PedidoRepository;
 import br.com.softblue.bluefood.domain.restaurante.CategoriaRestaurante;
 import br.com.softblue.bluefood.domain.restaurante.CategoriaRestauranteRepository;
 import br.com.softblue.bluefood.domain.restaurante.ItemCardapio;
@@ -33,22 +38,37 @@ public class InsertDataForTesting {
 	
 	@Autowired
 	private ItemCardapioRepository itemCardapioRepository;
+	 
+	@Autowired
+	private PedidoRepository pedidoRepository;
 	
 	@EventListener
 	public void onApplicationEvent(ContextRefreshedEvent event) {
-		clientes();
+		Cliente[] clientes = clientes();
 		Restaurante[] restaurantes = restaurantes();
 		itensCardapio(restaurantes);
 		
+		Pedido p = new Pedido();
+		p.setData(LocalDateTime.now());
+		p.setCliente(clientes[0]);
+		p.setRestaurante(restaurantes[0]);
+		p.setStatus(Status.Producao);
+		p.setSubtotal(BigDecimal.valueOf(10));
+		p.setTaxaEntrega(BigDecimal.valueOf(2));
+		p.setTotal(BigDecimal.valueOf(12.0));
+		pedidoRepository.save(p);
 	}
 
 	private Restaurante[] restaurantes() {
 		List<Restaurante> restaurantes = new ArrayList<>();
 		
-		CategoriaRestaurante categoriaPizza = CategoriaRestauranteRepository.findById(1).orElseThrow();
-		CategoriaRestaurante categoriaSanduiche = CategoriaRestauranteRepository.findById(2).orElseThrow();		
-		CategoriaRestaurante categoriaSobremesa = CategoriaRestauranteRepository.findById(5).orElseThrow();
-		CategoriaRestaurante categoriaJapones = CategoriaRestauranteRepository.findById(6).orElseThrow();
+		CategoriaRestaurante categoriaPizza = CategoriaRestauranteRepository.findById(1).orElseThrow(NoSuchElementException::new);
+		CategoriaRestaurante categoriaSanduiche = CategoriaRestauranteRepository.findById(2).orElseThrow(NoSuchElementException::new);		
+		CategoriaRestaurante categoriaSobremesa = CategoriaRestauranteRepository.findById(5).orElseThrow(NoSuchElementException::new);
+		CategoriaRestaurante categoriaJapones = CategoriaRestauranteRepository.findById(6).orElseThrow(NoSuchElementException::new);
+		CategoriaRestaurante categoriaChurrasco = CategoriaRestauranteRepository.findById(3).orElseThrow(NoSuchElementException::new);
+		CategoriaRestaurante categoriaSalada = CategoriaRestauranteRepository.findById(4).orElseThrow(NoSuchElementException::new);
+		
 		
 		Restaurante r = new Restaurante();
 		r.setNome("Bubger King");
@@ -128,12 +148,13 @@ public class InsertDataForTesting {
 		List<Cliente> clientes = new ArrayList<>();
 		
 		Cliente c = new Cliente();
-		c.setNome("Jo„o da Silva");
+		c.setNome("Jo√£o da Silva");
 		c.setEmail("joao.s@bluefood.com.br");
 		c.setSenha(StringUtils.encrypt("c"));
 		c.setCep("89300100");
 		c.setCpf("03099887666");
 		c.setTelefone("99355430001");
+		clientes.add(c);
 		clienteRepository.save(c);
 		
 		c = new Cliente();
@@ -143,6 +164,7 @@ public class InsertDataForTesting {
 		c.setCep("89300101");
 		c.setCpf("03099887677");
 		c.setTelefone("99355430002");
+		clientes.add(c);
 		clienteRepository.save(c);
 		
 		Cliente[] array = new Cliente[clientes.size()];
@@ -171,11 +193,21 @@ public class InsertDataForTesting {
 		ic.setImagem("0006-comida.png");
 		itemCardapioRepository.save(ic);
 		
+		ic = new ItemCardapio();
+		ic.setCategoria("Pizza");
+		ic.setDescricao("A pizza mais deliciosa do mundo, e que mata sua fome");
+		ic.setNome("Moda da casa");
+		ic.setPreco(BigDecimal.valueOf(18.5));
+		ic.setRestaurante(restaurantes[0]);
+		ic.setDestaque(true);
+		ic.setImagem("0002-comida.png");
+		itemCardapioRepository.save(ic);
+		
 		
 		ic = new ItemCardapio();
 		ic.setCategoria("Sanduiche");
 		ic.setDescricao("Sanduiche natural com peito de peru");
-		ic.setNome("SanduÌche Natural da casa");
+		ic.setNome("Sandu√≠che Natural da casa");
 		ic.setPreco(BigDecimal.valueOf(11.8));
 		ic.setRestaurante(restaurantes[0]);
 		ic.setDestaque(false);
@@ -185,7 +217,7 @@ public class InsertDataForTesting {
 		
 		ic = new ItemCardapio();
 		ic.setCategoria("Bebida");
-		ic.setDescricao("Bebida com g·s");
+		ic.setDescricao("Bebida com g√°s");
 		ic.setNome("Refrigerante tradicional");
 		ic.setPreco(BigDecimal.valueOf(9));
 		ic.setRestaurante(restaurantes[0]);
