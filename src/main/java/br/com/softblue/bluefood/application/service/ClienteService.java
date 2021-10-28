@@ -37,9 +37,13 @@ public class ClienteService {
 		clienteRepository.save(cliente);
 	}
 	private boolean validateEmail(String email, Integer id) {
-		@SuppressWarnings("unused")
 		Restaurante restaurante = restauranteRepository.findByEmail(email);
-			Cliente cliente = clienteRepository.findByEmail(email);
+		
+		if(restaurante != null ) {
+			return false;
+		}		
+		
+		Cliente cliente = clienteRepository.findByEmail(email);
 		
 		if(cliente != null) {
 			if(id == null ) {
@@ -54,3 +58,4 @@ public class ClienteService {
 	}
 
 }
+

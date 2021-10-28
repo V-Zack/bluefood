@@ -9,6 +9,8 @@ import java.util.NoSuchElementException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
+import org.springframework.core.env.Environment;
+import org.springframework.core.env.Profiles;
 import org.springframework.stereotype.Component;
 
 import br.com.softblue.bluefood.domain.cliente.Cliente;
@@ -44,7 +46,10 @@ public class InsertDataForTesting {
 	
 	@EventListener
 	public void onApplicationEvent(ContextRefreshedEvent event) {
-		Cliente[] clientes = clientes();
+		Environment environment = event.getApplicationContext().getEnvironment();
+		
+		if(environment.acceptsProfiles(Profiles.of("dev"))) {
+		    Cliente[] clientes = clientes();
 		Restaurante[] restaurantes = restaurantes();
 		itensCardapio(restaurantes);
 		
@@ -57,6 +62,8 @@ public class InsertDataForTesting {
 		p.setTaxaEntrega(BigDecimal.valueOf(2));
 		p.setTotal(BigDecimal.valueOf(12.0));
 		pedidoRepository.save(p);
+		
+    	}
 	}
 
 	private Restaurante[] restaurantes() {
